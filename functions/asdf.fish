@@ -16,7 +16,7 @@ function __asdf_get_version -a file -a plugin
 		echo $file does not exist
 		return 1
 	end
-	if not grep --color=never $plugin $file
+	if not grep --color=never $plugin $file | awk '{ print $2 }'
 		echo $plugin version is not set in $file
 	end
 end
