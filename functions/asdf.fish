@@ -4,7 +4,7 @@ function __asdf_set_version -a file -a plugin -a language_version
 		return 1
 	end
 
-	if test -f $file; and grep $plugin $file > /dev/null
+	if begin; test -f $file; and grep $plugin $file > /dev/null; end
 		sed -i -e "s/$plugin .*/$plugin $language_version/" $file
 	else
 		echo "$plugin $language_version" >> $file
@@ -12,10 +12,6 @@ function __asdf_set_version -a file -a plugin -a language_version
 end
 
 function __asdf_get_version -a file -a plugin
-	if not test -f $file
-		echo $file does not exist
-		return 1
-	end
 	if not grep --color=never $plugin $file | awk '{ print $2 }'
 		echo $plugin version is not set in $file
 	end
@@ -24,13 +20,6 @@ end
 function __asdf_version -a cmd
 	set -l argc (count $argv)
 
-	if test $argc -ne 2 -a $argc -ne 3
-		echo usage: $cmd PLUGIN [VERSION]
-		return 1
-	end
-
-	set -l plugin $argv[2]
-
 	set -l file
 	switch $cmd
 		case "global"
@@ -38,6 +27,23 @@ function __asdf_version -a cmd
 		case "local"
 			set file .tool-versions
 	end
+
+	if begin; test $argc -eq 1 -o $argc -eq 2; and not test -f $file; end
+		echo $file does not exist
+		return 1
+	end
+
+	if test $argc -gt 3
+		echo usage: $cmd PLUGIN [VERSION]
+		return 1
+	end
+
+	if test $argc -eq 1
+		cat $file
+		return
+	end
+
+	set -l plugin $argv[2]
 
 	if not contains $plugin (command asdf plugin-list)
 		echo plugin $plugin does not exist
