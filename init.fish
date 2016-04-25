@@ -4,7 +4,7 @@ if set -q ASDF_DIR
 end
 
 if not test -d $asdf_dir
-	git clone https://github.com/tuvistavie/asdf.git $asdf_dir --branch fish-support
+	git clone https://github.com/asdf-vm/asdf.git $asdf_dir
 end
 
 source $asdf_dir/asdf.fish
